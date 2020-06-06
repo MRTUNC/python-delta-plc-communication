@@ -1,0 +1,159 @@
+import serial
+import time
+import os
+import sqlite3
+import datetime
+from bitstring import Bits
+#ttyAMA0
+serialport=serial.Serial(port="COM3",baudrate=9600,bytesize=7,parity=serial.PARITY_EVEN,timeout=2,stopbits=serial.STOPBITS_ONE)
+veri=""
+def sericheck():
+  #
+  serialport.close()
+  if serialport.is_open!=True:
+    serialport.open()
+  
+#devp 14ss2 delta plc  kontrol ve haberlesme
+#serialport.write(b':010505000000F5\r\n') # y0 off   01 05 05 00  00 F5
+#serialport.write(b':01050500FF00F6\r\n') # y0 on
+
+#serialport.write(b':01050501FF00F5\r\n') # y1 on
+#serialport.write(b':010505010000F4\r\n') # y1 off
+
+#serialport.write(b':01050502FF00F4\r\n') # y2 on
+#serialport.write(b':010505020000F3\r\n') # y2 off  
+
+
+
+#serialport.write(b':01050503FF00F3\r\n') # Y3 on  
+#serialport.write(b':010505030000F2\r\n') # Y3 OFF
+  
+#serialport.write(b':01050504FF00F2\r\n') # Y4 on 
+#serialport.write(b':010505040000F1\r\n') # Y4 off 
+
+#serialport.write(b':01050505FF00F1\r\n') # Y5 on 
+#serialport.write(b':010505050000F0\r\n') # Y5 off
+
+
+
+def y0xon():
+  #
+  serialport.write(b':01050500FF00F6\r\n') #y0 on
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y1xon():
+  serialport.write(b':01050501FF00F5\r\n') # y1 on
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y2xon():
+  serialport.write(b':01050502FF00F4\r\n')
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y3xon():
+  serialport.write(b':01050503FF00F3\r\n') # y3 on
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y4xon():
+  serialport.write(b':01050504FF00F2\r\n') # Y4 on 
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y5xon():
+  serialport.write(b':01050505FF00F1\r\n')# y5 on
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+
+def y0xoff():
+  #
+  serialport.write(b':010505000000F5\r\n') # y0 off
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y1xoff():
+  serialport.write(b':010505010000F4\r\n') # y1 off
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y2xoff():
+  serialport.write(b':010505020000F3\r\n') # y2 off
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y3xoff():
+  serialport.write(b':010505030000F2\r\n') # Y3 OFF
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y4xoff():
+  serialport.write(b':010505040000F1\r\n') # Y4 off  
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+def y5xoff():
+  serialport.write(b':010505050000F0\r\n') # Y5 off
+  verii=serialport.readline().decode('utf-8')
+  print("gelenver>"+str(verii))
+  time.sleep(0.1)
+####### cikis verilerini okuma
+def cikisoku():
+  #
+  serialport.write(b':010105000008F1\r\n')
+  time.sleep(0.1)
+  veri2=serialport.readline().decode('utf-8')
+  print("gelenver status>"+str(veri2))
+  time.sleep(0.1)
+  if(veri2[1]=="0" and veri2[2]=="1" and veri2[3]=="0" and veri2[4]=="1"):
+    #
+    deger=str(veri2[7])+str(veri2[8])
+    print(deger)
+
+    a=Bits(hex='0x'+str(deger))
+    b=a.bin[::-1]
+    print(a.bin)
+    print ("ters")
+    print(b)
+    for i in range(8):
+      print("ouput:Y"+str(i)+":"+b[i]+"\n")
+
+
+    ####  input degerlerini okuma
+def inputoku():
+  serialport.write(b':010204000008F1\r\n')
+  veri3=serialport.readline().decode('utf-8')
+  print(veri3)
+  print("gelenver status>"+str(veri3))
+  time.sleep(0.1)
+  if(veri3[1]=="0" and veri3[2]=="1" and veri3[3]=="0" and veri3[4]=="2"):
+    #
+    deger2=str(veri3[7])+str(veri3[8])
+    print(deger2)
+
+    a1=Bits(hex='0x'+str(deger2))
+    b1=a1.bin[::-1]
+    print(a1.bin)
+    print ("ters")
+    print(b1)
+    for i in range(8):
+      print("input:x"+str(i)+":"+b1[i]+"\n")
+
+def kompleac():
+  y0xon()
+  y1xon()
+  y2xon()
+  y3xon()
+  y4xon()
+  y5xon()
+  
+def komplekapat():
+  y0xoff()
+  y1xoff()
+  y2xoff()
+  y3xoff()
+  y4xoff()
+  y5xoff()
+  time.sleep(5)
